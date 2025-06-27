@@ -22,71 +22,278 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-data = pd.read_csv('movies.csv')
-data.head(n=10)
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import numpy as np
+from scipy import stats
+from collections import Counter
+
+# Laad de gecombineerde dataset
+try:
+    df = pd.read_csv('data/combined_stats_by_genre_year.csv')
+    # Laad ook de overall yearly data voor de regressielijn
+    df_yearly = pd.read_csv('data/combined_stats_by_year.csv')
+    
+    # Gegevens opschonen - START EERDER!
+    df_clean = df.dropna(subset=['releaseYear', 'mean_rating', 'genre'])
+    df_clean = df_clean[(df_clean['releaseYear'] >= 1920) & (df_clean['releaseYear'] <= 2024)] 
+    df_clean = df_clean[(df_clean['mean_rating'] >= 0) & (df_clean['mean_rating'] <= 10)]
+    
+    # Extraheer individuele genres en maak aparte rijen
+    genre_rows = []
+    for _, row in df_clean.iterrows():
+        genres_str = str(row['genre'])
+        individual_genres = [g.strip() for g in genres_str.split(',')]
+        
+        for genre in individual_genres:
+            if genre and genre != 'nan':
+                genre_rows.append({
+                    'releaseYear': row['releaseYear'],
+                    'mean_rating': row['mean_rating'],
+                    'genre': genre,
+                    'unique_titles_count': row['unique_titles_count']
+                })
+    
+    genre_df = pd.DataFrame(genre_rows)
+    
+    # Selecteer genres met voldoende data
+    genre_counts = Counter(genre_df['genre'])
+    top_genres = [genre for genre, count in genre_counts.items() if count >= 15]
+    top_genres = sorted(top_genres)
+    
+    # Filter op topgenres
+    top_genre_df = genre_df[genre_df['genre'].isin(top_genres)]
+    
+    # Groepeer per genre en jaar
+    trend_data = top_genre_df.groupby(['genre', 'releaseYear']).agg({
+        'mean_rating': 'mean',
+        'unique_titles_count': 'sum'
+    }).reset_index()
+    
+    # Bereken OVERALL regressielijn voor alle genres samen
+    # Filter yearly data op dezelfde periode
+    df_yearly_clean = df_yearly.dropna(subset=['releaseYear', 'mean_rating'])
+    df_yearly_clean = df_yearly_clean[(df_yearly_clean['releaseYear'] >= 1920) & (df_yearly_clean['releaseYear'] <= 2024)]
+    df_yearly_clean = df_yearly_clean[(df_yearly_clean['mean_rating'] >= 0) & (df_yearly_clean['mean_rating'] <= 10)]
+    
+    # Linear regression voor overall trend
+    x_overall = df_yearly_clean['releaseYear'].values
+    y_overall = df_yearly_clean['mean_rating'].values
+    
+    slope_overall, intercept_overall, r_value_overall, p_value_overall, std_err_overall = stats.linregress(x_overall, y_overall)
+    
+    # Maak overall regressielijn
+    x_reg_overall = np.array([x_overall.min(), x_overall.max()])
+    y_reg_overall = slope_overall * x_reg_overall + intercept_overall
+    
+    # Overall statistieken
+    overall_stats = {
+        'slope': slope_overall,
+        'r_squared': r_value_overall**2,
+        'p_value': p_value_overall,
+        'trend': 'Stijgend' if slope_overall > 0 else 'Dalend',
+        'significance': 'Significant' if p_value_overall < 0.05 else 'Niet significant'
+    }
+    
+    # Maak de grafiek
+    fig = go.Figure()
+    
+    # Voeg datapunten toe voor elk genre
+    for genre in top_genres:
+        genre_data = trend_data[trend_data['genre'] == genre]
+        
+        # Scatter plot met werkelijke data
+        fig.add_trace(go.Scatter(
+            x=genre_data['releaseYear'],
+            y=genre_data['mean_rating'],
+            mode='markers+lines',
+            name=genre,
+            line=dict(width=2),
+            marker=dict(size=6),
+            visible='legendonly' if genre != top_genres[0] else True,
+            legendgroup=genre,
+            showlegend=True
+        ))
+    
+    # Voeg de OVERALL regressielijn toe (voor alle genres samen)
+    fig.add_trace(go.Scatter(
+        x=x_reg_overall,
+        y=y_reg_overall,
+        mode='lines',
+        name='Overall Trend (Alle Genres)',
+        line=dict(width=4, dash='solid', color='red'),
+        visible=True,
+        showlegend=True,
+        hovertemplate='<b>Overall Trend</b><br>Jaar: %{x}<br>Gemiddelde Rating: %{y:.2f}<extra></extra>'
+    ))
+    
+    # Voeg ook de werkelijke yearly data toe als referentie
+    fig.add_trace(go.Scatter(
+        x=df_yearly_clean['releaseYear'],
+        y=df_yearly_clean['mean_rating'],
+        mode='markers',
+        name='Werkelijke Jaargemiddelden',
+        marker=dict(size=4, color='red', opacity=0.6),
+        visible=True,
+        showlegend=True,
+        hovertemplate='<b>Werkelijk Jaargemiddelde</b><br>Jaar: %{x}<br>Gemiddelde Rating: %{y:.2f}<extra></extra>'
+    ))
+    
+    # Create highlight buttons for each genre
+    highlight_buttons = []
+    
+    # Reset button (no highlight)
+    visibility_reset = []
+    line_widths_reset = []
+    marker_sizes_reset = []
+    
+    for i, genre in enumerate(top_genres):
+        visibility_reset.append('legendonly' if genre != top_genres[0] else True)
+        line_widths_reset.append(2)  # Normal width
+        marker_sizes_reset.append(6)  # Normal size
+    
+    # Add visibility for non-genre traces (overall trend and yearly data)
+    visibility_reset.extend([True, True])
+    line_widths_reset.extend([4, None])  # Overall trend keeps its width, yearly data has no line
+    marker_sizes_reset.extend([None, 4])  # Overall trend has no markers, yearly data keeps its size
+    
+    highlight_buttons.append(dict(
+        args=[{
+            "visible": visibility_reset,
+            "line.width": line_widths_reset,
+            "marker.size": marker_sizes_reset
+        }],
+        label="Reset Highlight",
+        method="restyle"
+    ))
+    
+    # Create highlight button for each genre
+    for highlight_genre in top_genres:
+        visibility_highlight = []
+        line_widths_highlight = []
+        marker_sizes_highlight = []
+        
+        for i, genre in enumerate(top_genres):
+            if genre == highlight_genre:
+                visibility_highlight.append(True)  # Always show highlighted genre
+                line_widths_highlight.append(1.5)  # Thicker line for highlighted genre
+                marker_sizes_highlight.append(10)  # Larger markers for highlighted genre
+            else:
+                visibility_highlight.append('legendonly')  # Hide other genres
+                line_widths_highlight.append(1)  # Thinner lines for non-highlighted
+                marker_sizes_highlight.append(4)  # Smaller markers for non-highlighted
+        
+        # Add visibility for non-genre traces (overall trend and yearly data)
+        visibility_highlight.extend([True, True])
+        line_widths_highlight.extend([2, None])  # Make overall trend thinner when highlighting
+        marker_sizes_highlight.extend([None, 3])  # Make yearly data markers smaller
+        
+        highlight_buttons.append(dict(
+            args=[{
+                "visible": visibility_highlight,
+                "line.width": line_widths_highlight,
+                "marker.size": marker_sizes_highlight
+            }],
+            label=f"Highlight {highlight_genre}",
+            method="restyle"
+        ))
+    
+    # Update layout with enhanced button menu
+    fig.update_layout(
+        title='Genre Rating Trends met Highlight Feature (1960-2025)<br><sub>Rode lijn toont overall trend | Gebruik knoppen om genres te highlighten</sub>',
+        width=1400,
+        height=800,
+        title_font_size=16,
+        title_x=0.5,
+        xaxis_title="Jaar",
+        yaxis_title="Gemiddelde Rating",
+        legend_title="Genre",
+        hovermode='closest',
+        xaxis=dict(dtick=5),
+        legend=dict(
+            orientation="v",
+            yanchor="top",
+            y=1,
+            xanchor="left",
+            x=1.01
+        ),
+        margin=dict(r=200, t=120),  # Extra top margin for buttons
+        # Enhanced button menu
+        updatemenus=[
+            # Visibility control buttons
+            dict(
+                type="buttons",
+                direction="left",
+                buttons=list([
+                    dict(
+                        args=[{"visible": [True] * len(fig.data)}],
+                        label="Show All",
+                        method="restyle"
+                    ),
+                    dict(
+                        args=[{"visible": ['legendonly'] * len(top_genres) + [True, True]}],  # Keep overall trend visible
+                        label="Hide All Genres",
+                        method="restyle"
+                    )
+                ]),
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.01,
+                xanchor="left",
+                y=1.08,
+                yanchor="top"
+            ),
+            # Highlight control buttons
+            dict(
+                type="dropdown",
+                direction="down",
+                buttons=highlight_buttons,
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.195,
+                xanchor="left",
+                y=1.08,
+                yanchor="top"
+            )
+        ],
+        annotations=[
+            dict(
+                text="Visibility Controls:",
+                x=0.01, y=1.12,
+                xref="paper", yref="paper",
+                showarrow=False,
+                font=dict(size=12, color="black")
+            ),
+            dict(
+                text="Highlight Genre:",
+                x=0.25, y=1.12,
+                xref="paper", yref="paper",
+                showarrow=False,
+                font=dict(size=12, color="black")
+            )
+        ]
+    )
+    
+    # Toon de grafiek
+    fig.show()
+
+except FileNotFoundError:
+    pass
+except Exception as e:
+    pass
 ------------------
 
 
 [1;31m---------------------------------------------------------------------------[0m
-[1;31mFileNotFoundError[0m                         Traceback (most recent call last)
-Cell [1;32mIn[2], line 1[0m
-[1;32m----> 1[0m data [38;5;241m=[39m [43mpd[49m[38;5;241;43m.[39;49m[43mread_csv[49m[43m([49m[38;5;124;43m'[39;49m[38;5;124;43mmovies.csv[39;49m[38;5;124;43m'[39;49m[43m)[49m
-[0;32m      2[0m data[38;5;241m.[39mhead(n[38;5;241m=[39m[38;5;241m10[39m)
+[1;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+Cell [1;32mIn[12], line 6[0m
+[0;32m      4[0m [38;5;28;01mfrom[39;00m[38;5;250m [39m[38;5;21;01mplotly[39;00m[38;5;21;01m.[39;00m[38;5;21;01msubplots[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m make_subplots
+[0;32m      5[0m [38;5;28;01mimport[39;00m[38;5;250m [39m[38;5;21;01mnumpy[39;00m[38;5;250m [39m[38;5;28;01mas[39;00m[38;5;250m [39m[38;5;21;01mnp[39;00m
+[1;32m----> 6[0m [38;5;28;01mfrom[39;00m[38;5;250m [39m[38;5;21;01mscipy[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m stats
+[0;32m      7[0m [38;5;28;01mfrom[39;00m[38;5;250m [39m[38;5;21;01mcollections[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m Counter
+[0;32m      9[0m [38;5;66;03m# Laad de gecombineerde dataset[39;00m
 
-File [1;32m~\anaconda3\envs\InfoVis\lib\site-packages\pandas\io\parsers\readers.py:1026[0m, in [0;36mread_csv[1;34m(filepath_or_buffer, sep, delimiter, header, names, index_col, usecols, dtype, engine, converters, true_values, false_values, skipinitialspace, skiprows, skipfooter, nrows, na_values, keep_default_na, na_filter, verbose, skip_blank_lines, parse_dates, infer_datetime_format, keep_date_col, date_parser, date_format, dayfirst, cache_dates, iterator, chunksize, compression, thousands, decimal, lineterminator, quotechar, quoting, doublequote, escapechar, comment, encoding, encoding_errors, dialect, on_bad_lines, delim_whitespace, low_memory, memory_map, float_precision, storage_options, dtype_backend)[0m
-[0;32m   1013[0m kwds_defaults [38;5;241m=[39m _refine_defaults_read(
-[0;32m   1014[0m     dialect,
-[0;32m   1015[0m     delimiter,
-[1;32m   (...)[0m
-[0;32m   1022[0m     dtype_backend[38;5;241m=[39mdtype_backend,
-[0;32m   1023[0m )
-[0;32m   1024[0m kwds[38;5;241m.[39mupdate(kwds_defaults)
-[1;32m-> 1026[0m [38;5;28;01mreturn[39;00m [43m_read[49m[43m([49m[43mfilepath_or_buffer[49m[43m,[49m[43m [49m[43mkwds[49m[43m)[49m
-
-File [1;32m~\anaconda3\envs\InfoVis\lib\site-packages\pandas\io\parsers\readers.py:620[0m, in [0;36m_read[1;34m(filepath_or_buffer, kwds)[0m
-[0;32m    617[0m _validate_names(kwds[38;5;241m.[39mget([38;5;124m"[39m[38;5;124mnames[39m[38;5;124m"[39m, [38;5;28;01mNone[39;00m))
-[0;32m    619[0m [38;5;66;03m# Create the parser.[39;00m
-[1;32m--> 620[0m parser [38;5;241m=[39m TextFileReader(filepath_or_buffer, [38;5;241m*[39m[38;5;241m*[39mkwds)
-[0;32m    622[0m [38;5;28;01mif[39;00m chunksize [38;5;129;01mor[39;00m iterator:
-[0;32m    623[0m     [38;5;28;01mreturn[39;00m parser
-
-File [1;32m~\anaconda3\envs\InfoVis\lib\site-packages\pandas\io\parsers\readers.py:1620[0m, in [0;36mTextFileReader.__init__[1;34m(self, f, engine, **kwds)[0m
-[0;32m   1617[0m     [38;5;28mself[39m[38;5;241m.[39moptions[[38;5;124m"[39m[38;5;124mhas_index_names[39m[38;5;124m"[39m] [38;5;241m=[39m kwds[[38;5;124m"[39m[38;5;124mhas_index_names[39m[38;5;124m"[39m]
-[0;32m   1619[0m [38;5;28mself[39m[38;5;241m.[39mhandles: IOHandles [38;5;241m|[39m [38;5;28;01mNone[39;00m [38;5;241m=[39m [38;5;28;01mNone[39;00m
-[1;32m-> 1620[0m [38;5;28mself[39m[38;5;241m.[39m_engine [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_make_engine[49m[43m([49m[43mf[49m[43m,[49m[43m [49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mengine[49m[43m)[49m
-
-File [1;32m~\anaconda3\envs\InfoVis\lib\site-packages\pandas\io\parsers\readers.py:1880[0m, in [0;36mTextFileReader._make_engine[1;34m(self, f, engine)[0m
-[0;32m   1878[0m     [38;5;28;01mif[39;00m [38;5;124m"[39m[38;5;124mb[39m[38;5;124m"[39m [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m mode:
-[0;32m   1879[0m         mode [38;5;241m+[39m[38;5;241m=[39m [38;5;124m"[39m[38;5;124mb[39m[38;5;124m"[39m
-[1;32m-> 1880[0m [38;5;28mself[39m[38;5;241m.[39mhandles [38;5;241m=[39m [43mget_handle[49m[43m([49m
-[0;32m   1881[0m [43m    [49m[43mf[49m[43m,[49m
-[0;32m   1882[0m [43m    [49m[43mmode[49m[43m,[49m
-[0;32m   1883[0m [43m    [49m[43mencoding[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43moptions[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mencoding[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;28;43;01mNone[39;49;00m[43m)[49m[43m,[49m
-[0;32m   1884[0m [43m    [49m[43mcompression[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43moptions[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mcompression[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;28;43;01mNone[39;49;00m[43m)[49m[43m,[49m
-[0;32m   1885[0m [43m    [49m[43mmemory_map[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43moptions[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mmemory_map[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;28;43;01mFalse[39;49;00m[43m)[49m[43m,[49m
-[0;32m   1886[0m [43m    [49m[43mis_text[49m[38;5;241;43m=[39;49m[43mis_text[49m[43m,[49m
-[0;32m   1887[0m [43m    [49m[43merrors[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43moptions[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mencoding_errors[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;124;43m"[39;49m[38;5;124;43mstrict[39;49m[38;5;124;43m"[39;49m[43m)[49m[43m,[49m
-[0;32m   1888[0m [43m    [49m[43mstorage_options[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43moptions[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mstorage_options[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;28;43;01mNone[39;49;00m[43m)[49m[43m,[49m
-[0;32m   1889[0m [43m[49m[43m)[49m
-[0;32m   1890[0m [38;5;28;01massert[39;00m [38;5;28mself[39m[38;5;241m.[39mhandles [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m
-[0;32m   1891[0m f [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39mhandles[38;5;241m.[39mhandle
-
-File [1;32m~\anaconda3\envs\InfoVis\lib\site-packages\pandas\io\common.py:873[0m, in [0;36mget_handle[1;34m(path_or_buf, mode, encoding, compression, memory_map, is_text, errors, storage_options)[0m
-[0;32m    868[0m [38;5;28;01melif[39;00m [38;5;28misinstance[39m(handle, [38;5;28mstr[39m):
-[0;32m    869[0m     [38;5;66;03m# Check whether the filename is to be opened in binary mode.[39;00m
-[0;32m    870[0m     [38;5;66;03m# Binary mode does not support 'encoding' and 'newline'.[39;00m
-[0;32m    871[0m     [38;5;28;01mif[39;00m ioargs[38;5;241m.[39mencoding [38;5;129;01mand[39;00m [38;5;124m"[39m[38;5;124mb[39m[38;5;124m"[39m [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m ioargs[38;5;241m.[39mmode:
-[0;32m    872[0m         [38;5;66;03m# Encoding[39;00m
-[1;32m--> 873[0m         handle [38;5;241m=[39m [38;5;28;43mopen[39;49m[43m([49m
-[0;32m    874[0m [43m            [49m[43mhandle[49m[43m,[49m
-[0;32m    875[0m [43m            [49m[43mioargs[49m[38;5;241;43m.[39;49m[43mmode[49m[43m,[49m
-[0;32m    876[0m [43m            [49m[43mencoding[49m[38;5;241;43m=[39;49m[43mioargs[49m[38;5;241;43m.[39;49m[43mencoding[49m[43m,[49m
-[0;32m    877[0m [43m            [49m[43merrors[49m[38;5;241;43m=[39;49m[43merrors[49m[43m,[49m
-[0;32m    878[0m [43m            [49m[43mnewline[49m[38;5;241;43m=[39;49m[38;5;124;43m"[39;49m[38;5;124;43m"[39;49m[43m,[49m
-[0;32m    879[0m [43m        [49m[43m)[49m
-[0;32m    880[0m     [38;5;28;01melse[39;00m:
-[0;32m    881[0m         [38;5;66;03m# Binary mode[39;00m
-[0;32m    882[0m         handle [38;5;241m=[39m [38;5;28mopen[39m(handle, ioargs[38;5;241m.[39mmode)
-
-[1;31mFileNotFoundError[0m: [Errno 2] No such file or directory: 'movies.csv'
+[1;31mModuleNotFoundError[0m: No module named 'scipy'
 
