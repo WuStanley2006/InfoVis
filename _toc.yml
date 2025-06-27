@@ -5,3 +5,5 @@ format: jb-book
 root: docs/home
 chapters:
 - file: docs/main
+- file: docs/Reflecties
+- file: docs/Werkverdeling_en_referenties
