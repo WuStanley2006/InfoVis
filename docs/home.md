@@ -1,3 +1,5 @@
+## Informatie Visualisatie
+
 Dennis Chan 15833526 
 
 Stanley Si Lin Wu 15417190 
@@ -9,7 +11,7 @@ Sander Neele 15857719
 Groep nummer: B1 (#1) 
 
 
-Inleiding
+# Inleiding
 
 Wat bepaalt het succes van een film of serie? En wat is het verschil tussen deze twee? Nu streamingdiensten zoals Netflix, HBO en Disney Plus onze kijkgewoontes beïnvloeden, wordt het steeds belangrijker om te begrijpen waarom bepaalde titels populairder zijn dan andere. Het platform IMDb verzamelt enorme hoeveelheden publiek data, waarmee we kunnen analyseren wat het publiek waardeert.
 
@@ -19,7 +21,7 @@ We benaderen dit onderwerp vanuit twee invalshoeken. Enerzijds kijken we naar de
 
 
 
-Dataset and preprocessing
+# Dataset and preprocessing
 Voor dit project kozen we twee datasets van IMDb, beschikbaar via Kaggle: één met de top 1000 best beoordeelde films en één met de top 1000 best beoordeelde series. Beide datasets bevatten informatie over genres, releasejaar, aantal stemmen en gemiddelde beoordeling. Ze zijn goed met elkaar te vergelijken omdat ze dezelfde structuur hebben.
 We kozen dit onderwerp omdat het aansluit bij de populaire cultuur en vragen oproept over wat een film of serie succesvol maakt. Beide datasets bevatten zes variabelen, wat het mogelijk maakt om de data overzichtelijk te analyseren en vanuit meerdere invalshoeken te benaderen.
 
@@ -34,13 +36,13 @@ releaseYear: verschijningsjaar
 
 
 
-Geen cleaning
+# Geen cleaning
 
 We hebben geen cleaning gebruikt, want er waren geen ontbrekende of inconsistente waarden die cleaning vereist. Daarnaast bevatten de dataset ook maar 6 variabeles. De eenvoud van de dataset maakte cleaning dus overbodig. 
 
 
 
-aggregation 
+# aggregation 
 
 Voor het samenvoegen van de films en series hadden we beide datasets samengevoegd tot pd.concat(), zodat alle films en series in één tabel staan. We hebben de label ‘serie’ voor series gegeven en voor films de label ‘film’ gegeven. 
 
