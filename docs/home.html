@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>&lt;no title&gt; &#8212; Jupyter Book Template</title>
+    <title>Informatie Visualisatie &#8212; Jupyter Book Template</title>
   
   
   
@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -171,7 +171,7 @@
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1 current active">
                 <a class="reference internal" href="#">
-                    <no title>
+                    Informatie Visualisatie
                 </a>
             </li>
         </ul>
@@ -186,6 +186,12 @@
 
 
 
+
+<li class="toctree-l1"><a class="reference internal" href="Reflecties.html">Beperkingen en reflectie</a></li>
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="Werkverdeling_en_referenties.html">Werkverdeling</a></li>
 
 </ul>
 
@@ -372,11 +378,24 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1><no title></h1>
+    <h1>Informatie Visualisatie</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Informatie Visualisatie</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#inleiding">Inleiding</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-and-preprocessing">Dataset and preprocessing</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#geen-cleaning">Geen cleaning</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#aggregation">aggregation</a></li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -386,17 +405,23 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <p>Dennis Chan 15833526</p>
+  <section id="informatie-visualisatie">
+<h1>Informatie Visualisatie<a class="headerlink" href="#informatie-visualisatie" title="Link to this heading">#</a></h1>
+<p>Dennis Chan 15833526</p>
 <p>Stanley Si Lin Wu 15417190</p>
 <p>Michael Dong 15804232</p>
 <p>Sander Neele 15857719</p>
 <p>Groep nummer: B1 (#1)</p>
-<p>Inleiding</p>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="inleiding">
+<h1>Inleiding<a class="headerlink" href="#inleiding" title="Link to this heading">#</a></h1>
 <p>Wat bepaalt het succes van een film of serie? En wat is het verschil tussen deze twee? Nu streamingdiensten zoals Netflix, HBO en Disney Plus onze kijkgewoontes beïnvloeden, wordt het steeds belangrijker om te begrijpen waarom bepaalde titels populairder zijn dan andere. Het platform IMDb verzamelt enorme hoeveelheden publiek data, waarmee we kunnen analyseren wat het publiek waardeert.</p>
 <p>In dit project analyseren we gegevens van de best beoordeelde films en series op IMDb. We gebruiken hiervoor twee datasets: één met de top 1000 films en één met de top 1000 series. Beide bevatten informatie over genres, releasejaar, aantal stemmen en de gemiddelde beoordeling. Door deze data te combineren met interactieve visualisaties onderzoeken we hoe factoren zoals genre en populariteit samenhangen met de waardering van het publiek, en wat deze patronen ons kunnen vertellen over het succes van films en series.</p>
 <p>We benaderen dit onderwerp vanuit twee invalshoeken. Enerzijds kijken we naar de groeiende voorkeur voor series: ze bieden meer diepgang, langere verhaallijnen en passen beter bij het kijkgedrag van de moderne gebruiker.</p>
-<p>Dataset and preprocessing
-Voor dit project kozen we twee datasets van IMDb, beschikbaar via Kaggle: één met de top 1000 best beoordeelde films en één met de top 1000 best beoordeelde series. Beide datasets bevatten informatie over genres, releasejaar, aantal stemmen en gemiddelde beoordeling. Ze zijn goed met elkaar te vergelijken omdat ze dezelfde structuur hebben.
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="dataset-and-preprocessing">
+<h1>Dataset and preprocessing<a class="headerlink" href="#dataset-and-preprocessing" title="Link to this heading">#</a></h1>
+<p>Voor dit project kozen we twee datasets van IMDb, beschikbaar via Kaggle: één met de top 1000 best beoordeelde films en één met de top 1000 best beoordeelde series. Beide datasets bevatten informatie over genres, releasejaar, aantal stemmen en gemiddelde beoordeling. Ze zijn goed met elkaar te vergelijken omdat ze dezelfde structuur hebben.
 We kozen dit onderwerp omdat het aansluit bij de populaire cultuur en vragen oproept over wat een film of serie succesvol maakt. Beide datasets bevatten zes variabelen, wat het mogelijk maakt om de data overzichtelijk te analyseren en vanuit meerdere invalshoeken te benaderen.</p>
 <p>omschrijving van de gebruikte variabelen
 Dataset 1 en 2:
@@ -405,15 +430,20 @@ Genres: De genres behorend bij de film of serie
 averageRating: de gemiddelde rating
 numVotes: Aantal stemmen op een film of serie
 releaseYear: verschijningsjaar</p>
-<p>Geen cleaning</p>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="geen-cleaning">
+<h1>Geen cleaning<a class="headerlink" href="#geen-cleaning" title="Link to this heading">#</a></h1>
 <p>We hebben geen cleaning gebruikt, want er waren geen ontbrekende of inconsistente waarden die cleaning vereist. Daarnaast bevatten de dataset ook maar 6 variabeles. De eenvoud van de dataset maakte cleaning dus overbodig.</p>
-<p>aggregation</p>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="aggregation">
+<h1>aggregation<a class="headerlink" href="#aggregation" title="Link to this heading">#</a></h1>
 <p>Voor het samenvoegen van de films en series hadden we beide datasets samengevoegd tot pd.concat(), zodat alle films en series in één tabel staan. We hebben de label ‘serie’ voor series gegeven en voor films de label ‘film’ gegeven.</p>
 <p>Bij de eerste aggregatie (combined_votes_by_year.csv) hebben we voor numvotes ‘sum’ gebruikt. Hierbij telt het totale aantal stemmen per jaar op van zowel films als series. Ook hebben we gebruik gemaakt van ‘lambda x: “ | “.join(x) ‘. DIt combineert alle titels per jaar met een | als scheidingsteken. De groepering is op release Year gebaseerd. HIerdoor konden we films en series samen analyseren<br />
 Bij de tweede aggregatie (combined_stats_by_year.csv) is de groepering ook gebaseerd op release Year. De variabeles: averagerating, numvotes, title en type werden hierbij gebruikt. Hierdoor konden we trends per jaar bekijken (stemmen en ratings)
 Bij de derde aggregatie (combined_stats_by_genre_year.csv) hebben we de genres gesplitst, want één film of serie kan meerdere genres bevatten. Hierbij hebben we de gemiddelde rating per genre per jaar geanalyseerd (mean_rating). Totale stemmen per genre per jaar (numVotes) en vervolgens de titel (title). Hierdoor was het mogelijk om inzicht te krijgen welke genres populair waren in bepaalde jaren.</p>
 <div class="toctree-wrapper compound">
 </div>
+</section>
 
     <script type="text/x-thebe-config">
     {
@@ -460,6 +490,26 @@ Bij de derde aggregatie (combined_stats_by_genre_year.csv) hebben we de genres g
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Informatie Visualisatie</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#inleiding">Inleiding</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-and-preprocessing">Dataset and preprocessing</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#geen-cleaning">Geen cleaning</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#aggregation">aggregation</a></li>
+</ul>
+
+  </nav></div>
+
+</div></div>
               
             
           </div>
