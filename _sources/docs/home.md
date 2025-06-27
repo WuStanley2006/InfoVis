@@ -42,7 +42,7 @@ We hebben geen cleaning gebruikt, want er waren geen ontbrekende of inconsistent
 
 
 
-# aggregation 
+# Aggregation 
 
 Voor het samenvoegen van de films en series hadden we beide datasets samengevoegd tot pd.concat(), zodat alle films en series in één tabel staan. We hebben de label ‘serie’ voor series gegeven en voor films de label ‘film’ gegeven. 
 
