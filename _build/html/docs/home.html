@@ -392,7 +392,7 @@ document.write(`
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#inleiding">Inleiding</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-and-preprocessing">Dataset and preprocessing</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#geen-cleaning">Geen cleaning</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#aggregation">aggregation</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#aggregation">Aggregation</a></li>
 </ul>
 
             </nav>
@@ -436,7 +436,7 @@ releaseYear: verschijningsjaar</p>
 <p>We hebben geen cleaning gebruikt, want er waren geen ontbrekende of inconsistente waarden die cleaning vereist. Daarnaast bevatten de dataset ook maar 6 variabeles. De eenvoud van de dataset maakte cleaning dus overbodig.</p>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="aggregation">
-<h1>aggregation<a class="headerlink" href="#aggregation" title="Link to this heading">#</a></h1>
+<h1>Aggregation<a class="headerlink" href="#aggregation" title="Link to this heading">#</a></h1>
 <p>Voor het samenvoegen van de films en series hadden we beide datasets samengevoegd tot pd.concat(), zodat alle films en series in één tabel staan. We hebben de label ‘serie’ voor series gegeven en voor films de label ‘film’ gegeven.</p>
 <p>Bij de eerste aggregatie (combined_votes_by_year.csv) hebben we voor numvotes ‘sum’ gebruikt. Hierbij telt het totale aantal stemmen per jaar op van zowel films als series. Ook hebben we gebruik gemaakt van ‘lambda x: “ | “.join(x) ‘. DIt combineert alle titels per jaar met een | als scheidingsteken. De groepering is op release Year gebaseerd. HIerdoor konden we films en series samen analyseren<br />
 Bij de tweede aggregatie (combined_stats_by_year.csv) is de groepering ook gebaseerd op release Year. De variabeles: averagerating, numvotes, title en type werden hierbij gebruikt. Hierdoor konden we trends per jaar bekijken (stemmen en ratings)
@@ -504,7 +504,7 @@ Bij de derde aggregatie (combined_stats_by_genre_year.csv) hebben we de genres g
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#inleiding">Inleiding</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#dataset-and-preprocessing">Dataset and preprocessing</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#geen-cleaning">Geen cleaning</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#aggregation">aggregation</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#aggregation">Aggregation</a></li>
 </ul>
 
   </nav></div>
