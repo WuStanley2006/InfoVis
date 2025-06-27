@@ -1,3 +1,14 @@
+Dennis Chan 15833526 
+
+Stanley Si Lin Wu 15417190 
+
+Michael Dong 15804232 
+
+Sander Neele 15857719 
+
+Groep nummer: B1 (#1) 
+
+
 Inleiding
 
 Wat bepaalt het succes van een film of serie? En wat is het verschil tussen deze twee? Nu streamingdiensten zoals Netflix, HBO en Disney Plus onze kijkgewoontes beïnvloeden, wordt het steeds belangrijker om te begrijpen waarom bepaalde titels populairder zijn dan andere. Het platform IMDb verzamelt enorme hoeveelheden publiek data, waarmee we kunnen analyseren wat het publiek waardeert.
