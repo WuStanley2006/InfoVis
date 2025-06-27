@@ -48,3 +48,4 @@ Bij de eerste aggregatie (combined_votes_by_year.csv) hebben we voor numvotes �
 Bij de tweede aggregatie (combined_stats_by_year.csv) is de groepering ook gebaseerd op release Year. De variabeles: averagerating, numvotes, title en type werden hierbij gebruikt. Hierdoor konden we trends per jaar bekijken (stemmen en ratings)
 Bij de derde aggregatie (combined_stats_by_genre_year.csv) hebben we de genres gesplitst, want één film of serie kan meerdere genres bevatten. Hierbij hebben we de gemiddelde rating per genre per jaar geanalyseerd (mean_rating). Totale stemmen per genre per jaar (numVotes) en vervolgens de titel (title). Hierdoor was het mogelijk om inzicht te krijgen welke genres populair waren in bepaalde jaren. 
 
+
